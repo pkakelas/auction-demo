@@ -40,6 +40,13 @@ class Auction:
             if self.verify_bid(player, bid):
                 self.update_max_bid(player, bid)
 
+    # TODO: Don't iterate in that
+    def charge_winner(self, winner_name):
+        for player in self.players:
+            if player.name == winner_name:
+                print(player.name)
+                player.pay(self.max_bid['amount'])
+
     def run(self):
         for round in range(self.rounds):
             self.get_entry_fee()
@@ -48,5 +55,6 @@ class Auction:
 
             self.play_round()
 
+        self.charge_winner(self.max_bid['player_name'])
         print("[AUCTION] Winner", self.max_bid) 
         return self.max_bid['player_name']

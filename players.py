@@ -32,10 +32,11 @@ class AbstractBidder:
         raise Exception("Should be implemented")
 
 # If player has money then increase max_bid by 10 else quit
-class DummyBidder(AbstractBidder):
+class RationalBidder(AbstractBidder):
     def make_bid(self, max_bid_amount):
-        if max_bid_amount < self.balance - 10:
-            return max_bid_amount + 10
+        to_bet = max_bid_amount + (.1 * max_bid_amount)
+        if to_bet <= self.balance:
+            return to_bet
 
         return 0
 
@@ -43,7 +44,16 @@ class DummyBidder(AbstractBidder):
 class RiskyBidder(AbstractBidder):
     # Main strategy implementation
     def make_bid(self, max_bid_amount):
-        if self.balance > 0:
-            return self.balance
+        return self.balance
 
-        return 0
+class FixedAmountBidder(AbstractBidder):
+    def make_bid(self, max_bid_amount):
+        to_bet = max_bid_amount + (.1 * max_bid_amount)
+
+        return to_bet if to_bet <= self.balance else 0
+
+class MiddleBidder(AbstractBidder):
+    def make_bid(self, max_bid_amount):
+        to_bet = max_bid_amount + (self.balance /  2)
+
+        return to_bet if to_bet <= self.balance else 0

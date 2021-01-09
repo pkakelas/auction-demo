@@ -2,21 +2,30 @@ import matplotlib.pyplot as plt
 from random import shuffle, randint
 
 from engine import Auction
-from players import DummyBidder, RiskyBidder
+from players import MiddleBidder, RiskyBidder, RationalBidder, FixedAmountBidder
 
-TRIALS = 100
+TRIALS = 300
 START_BALANCE = 10e6
 
 players = [
     {
-        'strategy': DummyBidder,
-        'name': 'kostas'
+        'strategy': FixedAmountBidder,
+        'name': 'Lakis'
     },
     {
-        'strategy': DummyBidder,
-        'name': 'takis'
+        'strategy': RiskyBidder,
+        'name': 'Takis'
+    },
+    {
+        'strategy': RationalBidder,
+        'name': 'Mpampis'
+    },
+    {
+        'strategy': MiddleBidder,
+        'name': 'Koula'
     }
 ]
+
 players = [player['strategy'](player['name'], START_BALANCE) for player in players]
 
 def get_random_auction_opts():
