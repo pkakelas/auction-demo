@@ -37,6 +37,6 @@ class Auction:
         max_bidder, max_bid = self.get_max_bidder(bids)
         self.players[max_bidder].pay(max_bid)
 
-        print("[AUCTION] Winner {} bidded {}", max_bidder, max_bid) 
+        print("[AUCTION] Winner {} bidded {}".format(max_bidder, max_bid))
 
-        return max_bidder
+        return max_bidder, max_bid

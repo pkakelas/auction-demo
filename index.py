@@ -1,35 +1,46 @@
 import matplotlib.pyplot as plt
-from random import shuffle, randint
 
 from engine import Auction
-from players import MiddleBidder, AllInBidder, IncreaseBidder, SameBidder, DoubleUpBidder, DistributeBidder
+from players import IncreaseBidder, EvenBidder, DrunkBidder, EqualDistributeBidder, ScaleBidder, DoubleUpBidder, DistributeBidder, MartingaleBidder, AllInBidder
 
-TRIALS = 100
+TRIALS = 1000
 START_BALANCE = 10e6
 BIDDERS = [
     {
-        'strategy': MiddleBidder,
+        'strategy': EqualDistributeBidder,
         'name': 'Soula'
+    },
+    {
+        'strategy': IncreaseBidder,
+        'name': 'Valantis'
+    },
+    {
+        'strategy': DrunkBidder,
+        'name': 'Voula'
     },
     {
         'strategy': DoubleUpBidder,
         'name': 'Koula'
-    },
+    }, 
     {
         'strategy': DistributeBidder,
         'name': 'Loulis'
     },
     {
-        'strategy': IncreaseBidder,
+        'strategy': ScaleBidder,
         'name': 'Makis'
     },
     {
-        'strategy': SameBidder,
+        'strategy': MartingaleBidder,
         'name': 'Lakis'
     },
     {
         'strategy': AllInBidder,
         'name': 'Toula'
+    },
+    {
+        'strategy': EvenBidder,
+        'name': 'Notis'
     },
 ]
 
@@ -39,19 +50,14 @@ for bidder in BIDDERS:
 
 print(players)
 
-def get_random_baseline_amount(prev_baseline_amount):
-    return prev_baseline_amount + randint(1, 10000)
-
 def main():
     winners = {}
-    baseline_amount = 0
+    baseline_amount = 1000
 
     for _ in range(TRIALS):
-        baseline_amount = get_random_baseline_amount(baseline_amount)
-
         auction = Auction(baseline_amount, players.copy())
-        winner = auction.run()
-        [player.announce_winner(winner) for player in players.values()]
+        winner, max_bid = auction.run()
+        [player.announce_winner(winner, max_bid) for player in players.values()]
         winners[winner] = winners[winner] + 1 if winner in winners else 1
 
     plt.bar(list(winners.keys()), list(winners.values()))
