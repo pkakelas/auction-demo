@@ -9,19 +9,11 @@ class AbstractBidder:
         self.balance -= amount
         return self.balance > 0
 
-    def receive(self, amount):
-        self.balance += amount 
-
     def get_balance(self):
         return self.balance
 
-    def set_auction_info(self, rounds, start_price, round_fee):
-        self.rounds = rounds
-        self.start_price = start_price
-        self.round_fee = round_fee 
-
-    def bid(self, max_bid_amount):
-        bid = self.make_bid(max_bid_amount)
+    def bid(self, baseline_amount):
+        bid = self.make_bid(baseline_amount)
         if bid > self.balance:
             raise Exception("Bidder bidding money he cannot afford")
 
@@ -46,14 +38,18 @@ class RiskyBidder(AbstractBidder):
     def make_bid(self, max_bid_amount):
         return self.balance
 
-class FixedAmountBidder(AbstractBidder):
-    def make_bid(self, max_bid_amount):
-        to_bet = max_bid_amount + (.1 * max_bid_amount)
+class IncreaseBidder(AbstractBidder):
+    def make_bid(self, baseline_amount):
+        to_bet = baseline_amount + (.1 * baseline_amount)
 
         return to_bet if to_bet <= self.balance else 0
 
 class MiddleBidder(AbstractBidder):
-    def make_bid(self, max_bid_amount):
-        to_bet = max_bid_amount + (self.balance /  2)
+    def make_bid(self, baseline_amount):
+        to_bet = baseline_amount + (self.balance / 2)
 
         return to_bet if to_bet <= self.balance else 0
+
+class AllInBidder(AbstractBidder):
+    def make_bid(self, max_bid_amount):
+        return self.balance

@@ -1,60 +1,42 @@
 class Auction:
-    def __init__(self, start_price, rounds, round_fee, players):
+    def __init__(self, baseline_amount, players):
         print("-- Starting new auction! --")
-        print("players: {}, start_price: {}, rounds: {}, round_fee: {}\n".format(len(players), start_price, rounds, round_fee))
+        print("players: {}, baseline_amount: {}\n".format(len(players), baseline_amount))
 
-        self.rounds = rounds
-        self.round_fee = round_fee
         self.players = players
-        self.max_bid = { 'player_name': None, 'amount': start_price }
-
-    def get_entry_fee(self):
-        print("[FEE] Players paying entry fee...")
-
-        for player in self.players:
-            if not player.pay(self.round_fee):
-                print("[FEE] Player quitted this auction:", player.name)
-                self.players.remove(player) 
+        self.baseline_amount = baseline_amount
 
     def verify_bid(self, player, bid):
-        if bid == 0:
-            print("Player quitted:", player.name)
-            self.players.remove(player)
-            return True
+        return bid <= player.get_balance()
 
-        if bid < self.max_bid['amount'] or bid > player.get_balance():
-            print("Player bidded an invalid amount:", player.name)
-            return False
+    def collect_bids(self):
+        bids = {}
 
-        return True
-    
-    def update_max_bid(self, player, amount):
-        self.max_bid['player_name'] = player.name
-        self.max_bid['amount'] = amount
-
-    def play_round(self):
-        for player in self.players:
-            bid = player.bid(self.max_bid['amount'])
-            print("[BIDDING] Player {} bidded {}".format(player.name, bid))
+        for name, player in self.players.items():
+            bid = player.bid(self.baseline_amount)
+            print("[BIDDING] Player {} bidded {}".format(name, bid))
 
             if self.verify_bid(player, bid):
-                self.update_max_bid(player, bid)
+                bids[name] = bid
 
-    # TODO: Don't iterate in that
-    def charge_winner(self, winner_name):
-        for player in self.players:
-            if player.name == winner_name:
-                print(player.name)
-                player.pay(self.max_bid['amount'])
+        return bids
+
+    def get_max_bidder(self, bids):
+        max_bid = -1
+        max_bidder = None
+
+        for name, bid in bids.items():
+            if bid > max_bid:
+                max_bidder = name
+                max_bid = bid
+
+        return max_bidder, max_bid
 
     def run(self):
-        for round in range(self.rounds):
-            self.get_entry_fee()
-            if len(self.players) == 1:
-                break
+        bids = self.collect_bids()
+        max_bidder, max_bid = self.get_max_bidder(bids)
+        self.players[max_bidder].pay(max_bid)
 
-            self.play_round()
+        print("[AUCTION] Winner {} bidded {}", max_bidder, max_bid) 
 
-        self.charge_winner(self.max_bid['player_name'])
-        print("[AUCTION] Winner", self.max_bid) 
-        return self.max_bid['player_name']
+        return max_bidder

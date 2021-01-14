@@ -2,51 +2,41 @@ import matplotlib.pyplot as plt
 from random import shuffle, randint
 
 from engine import Auction
-from players import MiddleBidder, RiskyBidder, RationalBidder, FixedAmountBidder
+from players import MiddleBidder, AllInBidder, IncreaseBidder
 
 TRIALS = 300
 START_BALANCE = 10e6
-
-players = [
-    {
-        'strategy': FixedAmountBidder,
-        'name': 'Lakis'
-    },
-    {
-        'strategy': RiskyBidder,
-        'name': 'Takis'
-    },
-    {
-        'strategy': RationalBidder,
-        'name': 'Mpampis'
-    },
+BIDDERS = [
     {
         'strategy': MiddleBidder,
+        'name': 'Soula'
+    },
+    {
+        'strategy': AllInBidder,
         'name': 'Koula'
+    },
+    {
+        'strategy': IncreaseBidder,
+        'name': 'Makis'
     }
 ]
 
-players = [player['strategy'](player['name'], START_BALANCE) for player in players]
+players = {}
+for bidder in BIDDERS:
+    players[bidder['name']] = bidder['strategy'](bidder['name'], START_BALANCE)
 
-def get_random_auction_opts():
-    rounds = randint (10, 1000)
-    start_price = randint(50, 10000)
-    round_fee = randint(10, 200)
+print(players)
 
-    print("start_price: {}, round_fee: {}, rounds: {}".format(start_price, round_fee, rounds))
-
-    return rounds,  start_price, round_fee
+def get_random_baseline_amount():
+    return randint(50, 10000)
 
 def main():
     winners = {}
 
     for _ in range(TRIALS):
-        rounds, start_price, round_fee = get_random_auction_opts()
-        [player.set_auction_info(rounds, start_price, round_fee) for player in players]
+        baseline_amount = get_random_baseline_amount()
 
-        shuffle(players)
-
-        auction = Auction(start_price, 5, round_fee, players.copy())
+        auction = Auction(baseline_amount, players.copy())
         winner = auction.run()
 
         winners[winner] = winners[winner] + 1 if winner in winners else 1
