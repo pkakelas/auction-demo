@@ -96,15 +96,6 @@ class EvenBidder(AbstractBidder):
 
         return 0
 
-# EqualDistributeBidder splits his balance evenly on the remaining trials
-class EqualDistributeBidder(AbstractBidder):
-    def make_bid(self, baseline_amount):
-        if self.prev_bid == 0:
-            return baseline_amount
-
-        trials_left = self.trials - self.current_trial
-        return int(self.balance / trials_left)
-
 # DistributeBidder splits his balance evenly on the remaining trials if he losses
 # otherwise he keeps his bid the same;
 class DistributeBidder(AbstractBidder):
